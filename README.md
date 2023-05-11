@@ -60,7 +60,7 @@ int main(int, char**) {
 It supports C++23's range formatting specifier and left spacing for rank ≥ 2 span.
 For fixed size mdspan (whose extent is known at compile time), formatting is optimized using `constexpr` declared variables.
 
-It is tested with ![Google test](https://github.com/google/googletest/issues), but not heavily tested. I appreciate your contribution.
+It is tested with [Google test](https://github.com/google/googletest/issues), but not robust. I appreciate your contribution.
 
 Note that it only supports `mdspan` with `layout_right` policy and `default_accessor` accessor.
 
