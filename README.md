@@ -35,12 +35,12 @@ int main(int, char**) {
      *  [ 3.0,  4.0]]
     */
 
-    auto magic_square = std::array {
-        'S', 'A', 'T', 'O', 'R',
-        'A', 'R', 'E', 'P', 'O',
-        'T', 'E', 'N', 'E', 'T',
-        'O', 'P', 'E', 'R', 'A',
-        'R', 'O', 'T', 'A', 'S'
+    auto magic_square = std::string {
+        "SATOR"
+        "AREPO"
+        "TENET"
+        "OPERA"
+        "ROTAS"
     };
     print("{:s}\n", mdspan { magic_square.data(), 5, 5 });
     /**
