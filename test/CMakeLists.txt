@@ -1,6 +1,10 @@
 project(mdspan_formatter_test)
 
-add_executable(mdspan_formatter_test main.cpp)
+enable_testing()
 
 find_package(GTest REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE mdspan_formatter GTest::GTest)
+
+add_executable(mdspan_formatter_test main.cpp std_format_test.cpp fmt_format_test.cpp)
+target_link_libraries(mdspan_formatter_test PRIVATE mdspan_formatter GTest::GTest)
+
+gtest_discover_tests(mdspan_formatter_test)
