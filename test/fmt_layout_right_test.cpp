@@ -5,7 +5,7 @@
 
 using namespace Kokkos;
 
-TEST(MDSPAN_FMT_FORMATTER_TEST, FIXED_SIZE_INTS_TEST){
+TEST(MDSPAN_FMT_FORMATTER_LAYOUT_RIGHT_TEST, FIXED_SIZE_INTS_TEST){
     auto nums = std::array { 1, 2, 3, 4, 5, 6 };
 
     auto nums1d = mdspan<int, extents<std::size_t, 6>> { nums.data() };
@@ -24,7 +24,7 @@ TEST(MDSPAN_FMT_FORMATTER_TEST, FIXED_SIZE_INTS_TEST){
               " [6]]", fmt::format("{}", nums6x1));
 }
 
-TEST(MDSPAN_FMT_FORMATTER_TEST, FIXED_SIZE_FLOATS_TEST){
+TEST(MDSPAN_FMT_FORMATTER_LAYOUT_RIGHT_TEST, FIXED_SIZE_FLOATS_TEST){
     auto nums = std::array {
         1.f, 2.f, 3.f, 4.f,
         5.f, 6.f, 7.f, 8.f,
@@ -58,7 +58,7 @@ TEST(MDSPAN_FMT_FORMATTER_TEST, FIXED_SIZE_FLOATS_TEST){
               "  [ 13,  14,  15,  16]]]", fmt::format("{:: >3}", nums2x2x4));
 }
 
-TEST(MDSPAN_FMT_FORMATTER_TEST, FIXED_SIZE_CHARS_TEST){
+TEST(MDSPAN_FMT_FORMATTER_LAYOUT_RIGHT_TEST, FIXED_SIZE_CHARS_TEST){
     auto magic_square = std::array {
         'S', 'A', 'T', 'O', 'R',
         'A', 'R', 'E', 'P', 'O',
@@ -80,7 +80,7 @@ TEST(MDSPAN_FMT_FORMATTER_TEST, FIXED_SIZE_CHARS_TEST){
               " ['R', 'O', 'T', 'A', 'S']]", fmt::format("{::?}", square5x5));
 }
 
-TEST(MDSPAN_FMT_FORMATTER_TEST, DYNAMIC_SIZE_INTS_TEST){
+TEST(MDSPAN_FMT_FORMATTER_LAYOUT_RIGHT_TEST, DYNAMIC_SIZE_INTS_TEST){
     auto nums = std::array { 1, 2, 3, 4, 5, 6 };
 
     auto nums1d = mdspan { nums.data(), 6 };
@@ -99,7 +99,7 @@ TEST(MDSPAN_FMT_FORMATTER_TEST, DYNAMIC_SIZE_INTS_TEST){
               " [6]]", fmt::format("{}", nums6x1));
 }
 
-TEST(MDSPAN_FMT_FORMATTER_TEST, DYNAMIC_SIZE_FLOATS_TEST){
+TEST(MDSPAN_FMT_FORMATTER_LAYOUT_RIGHT_TEST, DYNAMIC_SIZE_FLOATS_TEST){
     auto nums = std::array {
             1.f, 2.f, 3.f, 4.f,
             5.f, 6.f, 7.f, 8.f,
@@ -133,7 +133,7 @@ TEST(MDSPAN_FMT_FORMATTER_TEST, DYNAMIC_SIZE_FLOATS_TEST){
               "  [ 13,  14,  15,  16]]]", fmt::format("{:: >3}", nums2x2x4));
 }
 
-TEST(MDSPAN_FMT_FORMATTER_TEST, DYNAMIC_SIZE_CHARS_TEST){
+TEST(MDSPAN_FMT_FORMATTER_LAYOUT_RIGHT_TEST, DYNAMIC_SIZE_CHARS_TEST){
     auto magic_square = std::array {
             'S', 'A', 'T', 'O', 'R',
             'A', 'R', 'E', 'P', 'O',

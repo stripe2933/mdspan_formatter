@@ -17,8 +17,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 endif()
 
 find_package(mdspan REQUIRED)
-find_package(fmt REQUIRED)
-target_link_libraries(${PROJECT_NAME} INTERFACE std::mdspan fmt::fmt)
+target_link_libraries(${PROJECT_NAME} INTERFACE std::mdspan)
 
 if (BUILD_TEST)
     add_subdirectory(test)
