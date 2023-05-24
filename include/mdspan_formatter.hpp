@@ -47,8 +47,7 @@ private:
      * @param indices Indices of dropping axis.
      * @return Reduced mdspan whose rank is decreased by given number of indices.
      *         The return mdspan will be <tt> x[indices..., full_extent...] </tt> for \p layout_right and
-     *         <tt> x[full_extent..., ...indices] </tt> for \p layout_left. Note that index application is
-     *         reversed for \p layout_left.
+     *         <tt> x[full_extent..., indices...] </tt> for \p layout_left.
      * @example
      * @code
      * auto ints = std::array { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
@@ -58,7 +57,7 @@ private:
      * reduce_dimension(int2x2x3, 1, 1); // -> [10, 11, 12]
      *
      * auto int4x3 = mdspan<int, extents<std::size_t, 2, 2, 3>, layout_left> { ints.data() };
-     * reduce_dimension(int4x3, 2, 1); // -> [11, 12]
+     * reduce_dimension(int4x3, 1, 2); // -> [11, 12]
      * @endcode
      */
     template <typename... Indices>
