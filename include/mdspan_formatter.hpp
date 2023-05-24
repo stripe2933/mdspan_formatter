@@ -1,158 +1,77 @@
 #pragma once
 
-// TODO: mdspan formatter with layout_left policy is not implemented yet.
-
 #ifdef MDSPAN_FORMATTER_USE_FMT
 #include <fmt/ranges.h>
 #else
 #include <format>
 #endif
 
-#include <ranges>
-#include <array>
-
 #include <mdspan/mdspan.hpp>
+#include <experimental/__p2630_bits/submdspan.hpp>
 
-template <typename T, typename Extents, typename CharT>
+template <typename T, typename Extents, typename LayoutPolicy, typename CharT>
 #ifdef MDSPAN_FORMATTER_USE_FMT
-struct fmt::formatter<Kokkos::mdspan<T, Extents, Kokkos::layout_right>, CharT> : range_formatter<std::remove_cv_t<T>, CharT>{
+class fmt::formatter<Kokkos::mdspan<T, Extents, LayoutPolicy>, CharT> : public range_formatter<T, CharT>{
 #else
-struct std::formatter<Kokkos::mdspan<T, Extents, Kokkos::layout_right>, CharT> : range_formatter<std::remove_cv_t<T>, CharT>{
+class std::formatter<Kokkos::mdspan<T, Extents, LayoutPolicy>, CharT> : public range_formatter<T, CharT>{
 #endif
 public:
     template <typename FormatContext>
-    constexpr auto format(const Kokkos::mdspan<T, Extents, Kokkos::layout_right> &x, FormatContext &ctx) const{
-        return recursive_format(x, ctx, 1UZ);
+    constexpr auto format(const auto &x, FormatContext &ctx) const{
+        return format_submdspan(reduce_dimension(x), ctx, 1);
     }
 
 private:
-    template <typename InnerExtents, typename FormatContext>
-    constexpr auto recursive_format(const Kokkos::mdspan<T, InnerExtents, Kokkos::layout_right> &x, FormatContext &ctx, std::size_t depth) const{
-        if constexpr (InnerExtents::rank() == 1UZ){
-            // Format 1-dimensional span using specified format.
-            const auto span = std::span<T, InnerExtents::static_extent(0)> { x.data_handle(), x.data_handle() + x.extent(0) };
-            range_formatter<std::remove_cv_t<T>, CharT>::format(span, ctx);
-        }
-        else{
-            // Get extents<T, I2, ..., IN> from extents<T, I1, I2, ..., IN> (skip head template parameter).
-            using subextents = decltype([]<std::size_t I, std::size_t... J>(std::index_sequence<I, J...>){
-                return Kokkos::extents<typename InnerExtents::index_type, InnerExtents::static_extent(J)...>{};
-            }(std::make_index_sequence<InnerExtents::rank()>{}));
-
-            // Get number of dynamic extents in subextents.
-            constexpr std::size_t num_dynamic_subextents = []<std::size_t... I>(std::index_sequence<I...>){
-                return ((subextents::static_extent(I) == std::dynamic_extent) + ...);
-            }(std::make_index_sequence<subextents::rank()>{});
-
-            // Get x[0, ...], x[1, ...], ..., x[x.extents(0)-1, ...] view.
-            const auto subspans = [=](){
-                const auto stride = x.stride(0UZ);
-
-                if constexpr (num_dynamic_subextents > 0UZ) {
-                    // Since subextents contains dynamic_extent, dynamic extents should be manually passed to
-                    // mdspan constructor with fixed-size array type.
-                    std::array<std::size_t, num_dynamic_subextents> dynamic_subextents;
-                    for (auto i = 0UZ, j = 0UZ; j < num_dynamic_subextents; ++i) {
-                        if (subextents::static_extent(i) == std::dynamic_extent) {
-                            dynamic_subextents[j++] = x.extent(i + 1);
-                        }
-                    }
-
-                    return std::views::iota(static_cast<Extents::index_type>(0), x.extent(0))
-                           | std::views::transform([=](auto idx) { return Kokkos::mdspan<T, subextents> { x.data_handle() + stride * idx, dynamic_subextents }; });
-                }
-                else{
-                    return std::views::iota(static_cast<Extents::index_type>(0), x.extent(0))
-                           | std::views::transform([=](auto idx) { return Kokkos::mdspan<T, subextents> { x.data_handle() + stride * idx }; });
-                }
-            }();
-
-            format_to(ctx.out(), "[");
-            for (auto &&subspan : subspans | std::views::take(subspans.size() - 1UZ)){
-                recursive_format(subspan, ctx, depth + 1);
-
-                /*
-                 * Add left spacing by depth level.
-                 * [[1, 2, 3],       [[1, 2, 3],
-                 * [4, 5, 6]]    ->   [4, 5, 6]] (improved readability)
-                 */
-                format_to(ctx.out(), ",\n{0: ^{1}}", "", depth);
-            }
-            recursive_format(subspans.back(), ctx, depth + 1);
-            format_to(ctx.out(), "]");
-        }
-        return ctx.out();
-    }
-};
-
-template <typename T, typename Extents, typename CharT>
-#ifdef MDSPAN_FORMATTER_USE_FMT
-struct fmt::formatter<Kokkos::mdspan<T, Extents, Kokkos::layout_left>, CharT> : range_formatter<std::remove_cv_t<T>, CharT>{
-#else
-    struct std::formatter<Kokkos::mdspan<T, Extents, Kokkos::layout_left>, CharT> : range_formatter<std::remove_cv_t<T>, CharT>{
-#endif
-public:
     template <typename FormatContext>
-    constexpr auto format(const Kokkos::mdspan<T, Extents, Kokkos::layout_left> &x, FormatContext &ctx) const{
-        return recursive_format(x, ctx, 1UZ);
-    }
+    constexpr auto format_submdspan(auto &&x, FormatContext &ctx, std::size_t depth) const{
+        constexpr auto rank = std::remove_cvref_t<decltype(x)>::rank();
 
-private:
-    template <typename InnerExtents, typename FormatContext>
-    constexpr auto recursive_format(const Kokkos::mdspan<T, InnerExtents, Kokkos::layout_left> &x, FormatContext &ctx, std::size_t depth) const{
-        if constexpr (InnerExtents::rank() == 1UZ){
-            // Format 1-dimensional span using specified format.
-            const auto span = std::span<T, InnerExtents::static_extent(0)> { x.data_handle(), x.data_handle() + x.extent(0) };
-            range_formatter<std::remove_cv_t<T>, CharT>::format(span, ctx);
+        if constexpr (rank == 1UZ){
+            return range_formatter<T, CharT>::format(std::span { x.data_handle(), static_cast<std::size_t>(x.extent(0UZ)) }, ctx);
         }
         else{
-            // Get extents<T, I1, ..., I(N-1)> from extents<T, I1, I2, ..., IN> (drop tail template parameter).
-            using subextents = decltype([]<std::size_t... I>(std::index_sequence<I...>){
-                return Kokkos::extents<typename InnerExtents::index_type, InnerExtents::static_extent(I)...>{};
-            }(std::make_index_sequence<InnerExtents::rank() - 1>{}));
-
-            // Get number of dynamic extents in subextents.
-            constexpr std::size_t num_dynamic_subextents = []<std::size_t... I>(std::index_sequence<I...>){
-                return ((subextents::static_extent(I) == std::dynamic_extent) + ...);
-            }(std::make_index_sequence<subextents::rank()>{});
-
-            // Get x[..., 0], x[..., 1], ..., x[..., x.extents(x.rank()-1)-1] view.
-            const auto subspans = [=](){
-                const auto stride = x.stride(x.rank() - 1);
-
-                if constexpr (num_dynamic_subextents > 0UZ) {
-                    // Since subextents contains dynamic_extent, dynamic extents should be manually passed to
-                    // mdspan constructor with fixed-size array type.
-                    std::array<std::size_t, num_dynamic_subextents> dynamic_subextents;
-                    for (auto i = 0UZ, j = 0UZ; j < num_dynamic_subextents; ++i) {
-                        if (subextents::static_extent(i) == std::dynamic_extent) {
-                            dynamic_subextents[j++] = x.extent(i + 1);
-                        }
-                    }
-
-                    return std::views::iota(static_cast<Extents::index_type>(0), x.extent(x.rank() - 1))
-                           | std::views::transform([=](auto idx) { return Kokkos::mdspan<T, subextents, Kokkos::layout_left> { x.data_handle() + stride * idx, dynamic_subextents }; });
-                }
-                else{
-                    return std::views::iota(static_cast<Extents::index_type>(0), x.extent(x.rank() - 1))
-                           | std::views::transform([=](auto idx) { return Kokkos::mdspan<T, subextents, Kokkos::layout_left> { x.data_handle() + stride * idx }; });
-                }
-            }();
-
             format_to(ctx.out(), "[");
-            for (auto &&subspan : subspans | std::views::take(subspans.size() - 1UZ)){
-                recursive_format(subspan, ctx, depth + 1);
 
-                /*
-                 * Add left spacing by depth level.
-                 * [[1, 2, 3],       [[1, 2, 3],
-                 * [4, 5, 6]]    ->   [4, 5, 6]] (improved readability)
-                 */
-                format_to(ctx.out(), ",\n{0: ^{1}}", "", depth);
+            const auto primary_extent = x.extent(std::is_same_v<LayoutPolicy, Kokkos::layout_right> ? 0UZ : rank - 1UZ);
+            for (auto i = 0UZ; i < primary_extent - 1UZ; ++i){
+                format_submdspan(reduce_dimension(x, i), ctx, depth + 1UZ);
+                format_to(ctx.out(), ",\n{0: >{1}}", "", depth);
             }
-            recursive_format(subspans.back(), ctx, depth + 1);
-            format_to(ctx.out(), "]");
+            format_submdspan(reduce_dimension(x, primary_extent - 1UZ), ctx, depth + 1UZ);
+
+            return format_to(ctx.out(), "]");
         }
-        return ctx.out();
+    }
+
+    /**
+     * Reduce a mdspan with given primary indices.
+     * @param x A source mdspan to be reduced.
+     * @param indices Indices of dropping axis.
+     * @return Reduced mdspan whose rank is decreased by given number of indices.
+     *         The return mdspan will be <tt> x[indices..., full_extent...] </tt> for \p layout_right and
+     *         <tt> x[full_extent..., ...indices] </tt> for \p layout_left. Note that index application is
+     *         reversed for \p layout_left.
+     * @example
+     * @code
+     * auto ints = std::array { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+     *
+     * auto int2x2x3 = mdspan { ints.data(), 2, 2, 3 };
+     * reduce_dimension(int2x2x3, 0); // -> [[1, 2, 3], [4, 5, 6]]
+     * reduce_dimension(int2x2x3, 1, 1); // -> [10, 11, 12]
+     *
+     * auto int4x3 = mdspan<int, extents<std::size_t, 2, 2, 3>, layout_left> { ints.data() };
+     * reduce_dimension(int4x3, 2, 1); // -> [11, 12]
+     * @endcode
+     */
+    template <typename... Indices>
+    static constexpr auto reduce_dimension(auto &&x, Indices ...indices) {
+        return [&]<std::size_t... I>(std::index_sequence<I...>){
+            if constexpr (std::is_same_v<LayoutPolicy, Kokkos::layout_right>){
+                return Kokkos::Experimental::submdspan(x, indices..., std::make_pair(I, Kokkos::full_extent).second...);
+            }
+            else{
+                return Kokkos::Experimental::submdspan(x, std::make_pair(I, Kokkos::full_extent).second..., indices...);
+            }
+        }(std::make_index_sequence<std::remove_cvref_t<decltype(x)>::rank() - sizeof...(Indices)>{});
     }
 };
