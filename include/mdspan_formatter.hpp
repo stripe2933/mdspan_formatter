@@ -6,14 +6,14 @@
 #include <format>
 #endif
 
-#include <mdspan/mdspan.hpp>
+#include <experimental/mdspan>
 #include <experimental/__p2630_bits/submdspan.hpp>
 
 template <typename T, typename Extents, typename LayoutPolicy, typename CharT>
 #ifdef MDSPAN_FORMATTER_USE_FMT
-class fmt::formatter<Kokkos::mdspan<T, Extents, LayoutPolicy>, CharT> : public range_formatter<T, CharT>{
+class fmt::formatter<std::mdspan<T, Extents, LayoutPolicy>, CharT> : public range_formatter<T, CharT>{
 #else
-class std::formatter<Kokkos::mdspan<T, Extents, LayoutPolicy>, CharT> : public range_formatter<T, CharT>{
+class std::formatter<std::mdspan<T, Extents, LayoutPolicy>, CharT> : public range_formatter<T, CharT>{
 #endif
 public:
     template <typename FormatContext>
@@ -32,7 +32,7 @@ private:
         else{
             format_to(ctx.out(), "[");
 
-            const auto primary_extent = x.extent(std::is_same_v<LayoutPolicy, Kokkos::layout_right> ? 0UZ : rank - 1UZ);
+            const auto primary_extent = x.extent(std::is_same_v<LayoutPolicy, std::layout_right> ? 0UZ : rank - 1UZ);
             for (auto i = 0UZ; i < primary_extent - 1UZ; ++i){
                 format_submdspan(reduce_dimension(x, i), ctx, depth + 1UZ);
                 format_to(ctx.out(), ",\n{0: >{1}}", "", depth);
@@ -66,11 +66,11 @@ private:
     template <typename... Indices>
     static constexpr auto reduce_dimension(auto &&x, Indices ...indices) {
         return [&]<std::size_t... I>(std::index_sequence<I...>){
-            if constexpr (std::is_same_v<LayoutPolicy, Kokkos::layout_right>){
-                return Kokkos::Experimental::submdspan(x, indices..., std::make_pair(I, Kokkos::full_extent).second...);
+            if constexpr (std::is_same_v<LayoutPolicy, std::layout_right>){
+                return std::experimental::submdspan(x, indices..., std::make_pair(I, std::full_extent).second...);
             }
             else{
-                return Kokkos::Experimental::submdspan(x, std::make_pair(I, Kokkos::full_extent).second..., indices...);
+                return std::experimental::submdspan(x, std::make_pair(I, std::full_extent).second..., indices...);
             }
         }(std::make_index_sequence<std::remove_cvref_t<decltype(x)>::rank() - sizeof...(Indices)>{});
     }
