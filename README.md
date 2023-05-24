@@ -1,5 +1,5 @@
 # mdspan_formatter
-Make `std::mdspan` (multi-dimensional span; currently [`Kokkos::mdspan`](https://github.com/kokkos/mdspan)) formattable using `std::format`.
+Make `std::mdspan` (multi-dimensional span; currently [`Kokkos::mdspan`](https://github.com/kokkos/mdspan)) formattable using `std::format` or [fmt](https://github.com/fmtlib/fmt).
 
 ## Usage
 
@@ -57,17 +57,46 @@ int main(int, char**) {
 }
 ```
 
+Or you can use the library with fmt by enable the macro `MDSPAN_FORMATTER_USE_FMT`.
+
+```c++
+#define MDSPAN_FORMATTER_USE_FMT
+#include "mdspan_formatter.hpp"
+
+int main(int, char**) {
+    using namespace Kokkos;
+    
+    auto ints = std::array { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+    auto int2x2x3 = mdspan<int, dextents<std::size_t, 3>, layout_left> { ints.data(), 2, 2, 3 };
+    
+    fmt::print("{}\n", int2x2x3);
+    /**
+     * Output:
+     * 
+     * [[[1, 2],
+     *   [3, 4]],
+     *  [[5, 6],
+     *   [7, 8]],
+     *  [[9, 10],
+     *   [11, 12]]]
+     */
+    
+    return 0;
+}
+```
+
 It supports C++23's range formatting specifier and left spacing for rank ≥ 2 span.
 For fixed size mdspan (whose extent is known at compile time), formatting is optimized using `constexpr` declared variables.
 
 It is tested with [Google test](https://github.com/google/googletest/issues), but not robust. I appreciate your contribution.
 
-Note that it only supports `mdspan` with `layout_right` policy and `default_accessor` accessor.
+Note that it only supports `mdspan` with `default_accessor` accessor.
 
 # How to use
 
-Since it depends on range formatting and multidimensional subscript operator, you need at least C++23 compatible compiler.
-I build the library using Clang 16.0.1 and libc++13. GCC and MSVC are not tested yet.
+Since it depends on range formatting and multidimensional subscript operator, you need at least C++23 compatible compiler
+if you want to use the library with `std::format`. Currently only Clang with libc++16 supports it.
+GCC and MSVC are not tested yet.
 
 First, you need [Kokkos's mdspan](https://github.com/kokkos/mdspan), which is reference implementation of `std::mdspan` because none of compiler
 implemented mdspan at now.
@@ -75,10 +104,5 @@ implemented mdspan at now.
 For use formatter, copy [the header file](https://github.com/stripe2933/mdspan_formatter/blob/main/include/mdspan_formatter.hpp).
 You can use the library as header only file.
 
-If you want to build the test, download the repository and build CMake project. Note that Google Test and Kokkos mdspan library should be found using
+If you want to build the test, download the repository and build CMake project. Note that Google Test, fmt and Kokkos mdspan library should be found using
 `find_package` command.
-
-## TODO
-
-- Support `layout_left` policy.
-- More test.
