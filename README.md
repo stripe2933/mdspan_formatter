@@ -14,10 +14,8 @@ void print(std::format_string<T...> fmt, T &&...args){
 }
 
 int main(int, char**) {
-    using namespace Kokkos;
-
     auto nums = std::array { 1.f, 2.f, 3.f, 4.f };
-    print("{}\n", mdspan { nums.data(), 4, 1 });
+    print("{}\n", std::mdspan { nums.data(), 4, 1 });
     /**
      * Output:
      * 
@@ -27,7 +25,7 @@ int main(int, char**) {
      *  [4]]
     */
 
-    print("{:: >4.1f}\n", mdspan<float, extents<std::size_t, 2, 2>> { nums.data() });
+    print("{:: >4.1f}\n", std::mdspan<float, std::extents<std::size_t, 2, 2>> { nums.data() });
     /**
      * Output:
      * 
@@ -42,7 +40,7 @@ int main(int, char**) {
         "OPERA"
         "ROTAS"
     };
-    print("{:s}\n", mdspan { magic_square.data(), 5, 5 });
+    print("{:s}\n", std::mdspan { magic_square.data(), 5, 5 });
     /**
      * Output:
      * 
@@ -64,10 +62,8 @@ Or you can use the library with fmt by enable the macro `MDSPAN_FORMATTER_USE_FM
 #include "mdspan_formatter.hpp"
 
 int main(int, char**) {
-    using namespace Kokkos;
-    
     auto ints = std::array { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
-    auto int2x2x3 = mdspan<int, dextents<std::size_t, 3>, layout_left> { ints.data(), 2, 2, 3 };
+    auto int2x2x3 = std::mdspan<int, std::dextents<std::size_t, 3>, std::layout_left> { ints.data(), 2, 2, 3 };
     
     fmt::print("{}\n", int2x2x3);
     /**

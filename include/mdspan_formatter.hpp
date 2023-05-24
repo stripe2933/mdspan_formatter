@@ -16,14 +16,12 @@ class fmt::formatter<std::mdspan<T, Extents, LayoutPolicy>, CharT> : public rang
 class std::formatter<std::mdspan<T, Extents, LayoutPolicy>, CharT> : public range_formatter<T, CharT>{
 #endif
 public:
-    template <typename FormatContext>
-    constexpr auto format(const auto &x, FormatContext &ctx) const{
+    constexpr auto format(const auto &x, auto &ctx) const{
         return format_submdspan(reduce_dimension(x), ctx, 1);
     }
 
 private:
-    template <typename FormatContext>
-    constexpr auto format_submdspan(auto &&x, FormatContext &ctx, std::size_t depth) const{
+    constexpr auto format_submdspan(auto &&x, auto &ctx, std::size_t depth) const{
         constexpr auto rank = std::remove_cvref_t<decltype(x)>::rank();
 
         if constexpr (rank == 1UZ){
