@@ -24,18 +24,18 @@ private:
     constexpr auto format_submdspan(auto &&x, auto &ctx, std::size_t depth) const{
         constexpr auto rank = std::remove_cvref_t<decltype(x)>::rank();
 
-        if constexpr (rank == 1UZ){
-            return range_formatter<T, CharT>::format(std::span { x.data_handle(), static_cast<std::size_t>(x.extent(0UZ)) }, ctx);
+        if constexpr (rank == 1){
+            return range_formatter<T, CharT>::format(std::span { x.data_handle(), static_cast<std::size_t>(x.extent(0)) }, ctx);
         }
         else{
             format_to(ctx.out(), "[");
 
-            const auto primary_extent = x.extent(std::is_same_v<LayoutPolicy, std::layout_right> ? 0UZ : rank - 1UZ);
-            for (auto i = 0UZ; i < primary_extent - 1UZ; ++i){
-                format_submdspan(reduce_dimension(x, i), ctx, depth + 1UZ);
+            const auto primary_extent = x.extent(std::is_same_v<LayoutPolicy, std::layout_right> ? 0 : rank - 1);
+            for (std::size_t i = 0; i < primary_extent - (std::size_t)1; ++i){
+                format_submdspan(reduce_dimension(x, i), ctx, depth + 1);
                 format_to(ctx.out(), ",\n{0: >{1}}", "", depth);
             }
-            format_submdspan(reduce_dimension(x, primary_extent - 1UZ), ctx, depth + 1UZ);
+            format_submdspan(reduce_dimension(x, primary_extent - (std::size_t)1), ctx, depth + 1);
 
             return format_to(ctx.out(), "]");
         }

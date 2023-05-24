@@ -90,9 +90,12 @@ Note that it only supports `mdspan` with `default_accessor` accessor.
 
 # How to use
 
-Since it depends on range formatting and multidimensional subscript operator, you need at least C++23 compatible compiler
+Since it depends on range formatter, you need at least C++23 compatible compiler
 if you want to use the library with `std::format`. Currently only Clang with libc++16 supports it.
 GCC and MSVC are not tested yet.
+
+For use library with fmt, Clang ≥ 11.0.0 and GCC ≥ 10.2 with std ≥ c++20 condition are tested. MSVC is not tested yet.
+ [Try on Compiler Explorer](https://godbolt.org/z/1sTd18Gxs).
 
 First, you need [Kokkos's mdspan](https://github.com/kokkos/mdspan), which is reference implementation of `std::mdspan` because none of compiler
 implemented mdspan at now.
