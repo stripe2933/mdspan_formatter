@@ -66,11 +66,6 @@ TEST(MDSPAN_FMT_FORMATTER_LAYOUT_LEFT_TEST, FIXED_SIZE_CHARS_TEST){
     };
 
     auto square5x5 = std::mdspan<char, std::extents<std::ptrdiff_t, 5, 5>, std::layout_left> { magic_square.data() };
-//    EXPECT_EQ("[SATOR,\n"
-//              " AREPO,\n"
-//              " TENET,\n"
-//              " OPERA,\n"
-//              " ROTAS]", fmt::format("{:s}", square5x5));
     EXPECT_EQ("[['S', 'A', 'T', 'O', 'R'],\n"
               " ['A', 'R', 'E', 'P', 'O'],\n"
               " ['T', 'E', 'N', 'E', 'T'],\n"
@@ -141,14 +136,25 @@ TEST(MDSPAN_FMT_FORMATTER_LAYOUT_LEFT_TEST, DYNAMIC_SIZE_CHARS_TEST){
     };
 
     auto square5x5 = std::mdspan<char, std::dextents<std::size_t, 2>, std::layout_left> { magic_square.data(), 5, 5 };
-//    EXPECT_EQ("[SATOR,\n"
-//              " AREPO,\n"
-//              " TENET,\n"
-//              " OPERA,\n"
-//              " ROTAS]", fmt::format("{:s}", square5x5));
     EXPECT_EQ("[['S', 'A', 'T', 'O', 'R'],\n"
               " ['A', 'R', 'E', 'P', 'O'],\n"
               " ['T', 'E', 'N', 'E', 'T'],\n"
               " ['O', 'P', 'E', 'R', 'A'],\n"
               " ['R', 'O', 'T', 'A', 'S']]", fmt::format("{::?}", square5x5));
+}
+
+TEST(MDSPAN_FMT_FORMATTER_LAYOUT_LEFT_TEST, STATIC_ZERO_SIZE_TEST){
+    auto one = std::array { 1 };
+    EXPECT_EQ("[]", fmt::format("{}", std::mdspan<int, std::extents<std::size_t, 0>, std::layout_left> { one.data() }));
+    EXPECT_EQ("[[],\n"
+              " []]", fmt::format("{}", std::mdspan<int, std::extents<std::ptrdiff_t, 0, 2>, std::layout_left> { one.data() }));
+    EXPECT_EQ("[]", fmt::format("{}", std::mdspan<int, std::extents<int, 3, 0>, std::layout_left> { one.data() }));
+}
+
+TEST(MDSPAN_FMT_FORMATTER_LAYOUT_LEFT_TEST, DYNAMIC_ZERO_SIZE_TEST){
+    auto one = std::array { 1 };
+    EXPECT_EQ("[]", fmt::format("{}", std::mdspan<int, std::dextents<std::size_t, 1>, std::layout_left> { one.data(), 0 }));
+    EXPECT_EQ("[[],\n"
+              " []]", fmt::format("{}", std::mdspan<int, std::dextents<std::size_t, 2>, std::layout_left> { one.data(), 0, 2 }));
+    EXPECT_EQ("[]", fmt::format("{}", std::mdspan<int, std::dextents<std::size_t, 2>, std::layout_left> { one.data(), 3, 0 }));
 }

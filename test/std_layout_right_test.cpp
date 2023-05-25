@@ -150,3 +150,19 @@ TEST(MDSPAN_STD_FORMATTER_LAYOUT_RIGHT_TEST, DYNAMIC_SIZE_CHARS_TEST){
               " ['O', 'P', 'E', 'R', 'A'],\n"
               " ['R', 'O', 'T', 'A', 'S']]", std::format("{::?}", square5x5));
 }
+
+TEST(MDSPAN_STD_FORMATTER_LAYOUT_RIGHT_TEST, STATIC_ZERO_SIZE_TEST){
+    auto one = std::array { 1 };
+    EXPECT_EQ("[]", std::format("{}", std::mdspan<int, std::extents<std::size_t, 0>> { one.data() }));
+    EXPECT_EQ("[[],\n"
+              " []]", std::format("{}", std::mdspan<int, std::extents<std::ptrdiff_t, 2, 0>> { one.data() }));
+    EXPECT_EQ("[]", std::format("{}", std::mdspan<int, std::extents<int, 0, 3>> { one.data() }));
+}
+
+TEST(MDSPAN_STD_FORMATTER_LAYOUT_RIGHT_TEST, DYNAMIC_ZERO_SIZE_TEST){
+    auto one = std::array { 1 };
+    EXPECT_EQ("[]", std::format("{}", std::mdspan { one.data(), 0 }));
+    EXPECT_EQ("[[],\n"
+              " []]", std::format("{}", std::mdspan { one.data(), 2, 0 }));
+    EXPECT_EQ("[]", std::format("{}", std::mdspan { one.data(), 0, 3 }));
+}

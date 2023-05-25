@@ -66,11 +66,6 @@ TEST(MDSPAN_FMT_FORMATTER_LAYOUT_RIGHT_TEST, FIXED_SIZE_CHARS_TEST){
     };
 
     auto square5x5 = std::mdspan<char, std::extents<std::ptrdiff_t, 5, 5>> { magic_square.data() };
-//    EXPECT_EQ("[SATOR,\n"
-//              " AREPO,\n"
-//              " TENET,\n"
-//              " OPERA,\n"
-//              " ROTAS]", fmt::format("{:s}", square5x5));
     EXPECT_EQ("[['S', 'A', 'T', 'O', 'R'],\n"
               " ['A', 'R', 'E', 'P', 'O'],\n"
               " ['T', 'E', 'N', 'E', 'T'],\n"
@@ -141,14 +136,25 @@ TEST(MDSPAN_FMT_FORMATTER_LAYOUT_RIGHT_TEST, DYNAMIC_SIZE_CHARS_TEST){
     };
 
     auto square5x5 = std::mdspan { magic_square.data(), 5, 5 };
-//    EXPECT_EQ("[SATOR,\n"
-//              " AREPO,\n"
-//              " TENET,\n"
-//              " OPERA,\n"
-//              " ROTAS]", fmt::format("{:s}", square5x5));
     EXPECT_EQ("[['S', 'A', 'T', 'O', 'R'],\n"
               " ['A', 'R', 'E', 'P', 'O'],\n"
               " ['T', 'E', 'N', 'E', 'T'],\n"
               " ['O', 'P', 'E', 'R', 'A'],\n"
               " ['R', 'O', 'T', 'A', 'S']]", fmt::format("{::?}", square5x5));
+}
+
+TEST(MDSPAN_FMT_FORMATTER_LAYOUT_RIGHT_TEST, STATIC_ZERO_SIZE_TEST){
+    auto one = std::array { 1 };
+    EXPECT_EQ("[]", fmt::format("{}", std::mdspan<int, std::extents<std::size_t, 0>> { one.data() }));
+    EXPECT_EQ("[[],\n"
+              " []]", fmt::format("{}", std::mdspan<int, std::extents<std::ptrdiff_t, 2, 0>> { one.data() }));
+    EXPECT_EQ("[]", fmt::format("{}", std::mdspan<int, std::extents<int, 0, 3>> { one.data() }));
+}
+
+TEST(MDSPAN_FMT_FORMATTER_LAYOUT_RIGHT_TEST, DYNAMIC_ZERO_SIZE_TEST){
+    auto one = std::array { 1 };
+    EXPECT_EQ("[]", fmt::format("{}", std::mdspan { one.data(), 0 }));
+    EXPECT_EQ("[[],\n"
+              " []]", fmt::format("{}", std::mdspan { one.data(), 2, 0 }));
+    EXPECT_EQ("[]", fmt::format("{}", std::mdspan { one.data(), 0, 3 }));
 }
