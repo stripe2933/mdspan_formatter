@@ -31,11 +31,13 @@ private:
             format_to(ctx.out(), "[");
 
             const auto primary_extent = x.extent(std::is_same_v<LayoutPolicy, std::layout_right> ? 0 : rank - 1);
-            for (std::size_t i = 0; i < primary_extent - (std::size_t)1; ++i){
-                format_submdspan(reduce_dimension(x, i), ctx, depth + 1);
-                format_to(ctx.out(), ",\n{0: >{1}}", "", depth);
+            if (primary_extent > 0){
+                for (std::size_t i = 0; i < primary_extent - (std::size_t)1; ++i){
+                    format_submdspan(reduce_dimension(x, i), ctx, depth + 1);
+                    format_to(ctx.out(), ",\n{0: >{1}}", "", depth);
+                }
+                format_submdspan(reduce_dimension(x, primary_extent - (std::size_t)1), ctx, depth + 1);
             }
-            format_submdspan(reduce_dimension(x, primary_extent - (std::size_t)1), ctx, depth + 1);
 
             return format_to(ctx.out(), "]");
         }
