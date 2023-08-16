@@ -6,7 +6,7 @@ Make `std::mdspan` (multi-dimensional span; currently [`Kokkos::mdspan`](https:/
 ```c++
 #include <print>
 
-#include "mdspan_formatter.hpp"
+#include <mdspan_formatter.hpp>
 
 int main(int, char**) {
     std::array nums { 1.f, 2.f, 3.f, 4.f };
@@ -52,7 +52,7 @@ int main(int, char**) {
 Or you can use the library with fmt by header file `mdspan_fmt_formatter.hpp`.
 
 ```c++
-#include "mdspan_fmt_formatter.hpp"
+#include <mdspan_fmt_formatter.hpp>
 
 int main(int, char**) {
     std::array ints { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
