@@ -21,6 +21,9 @@ public:
     }
 
 private:
+    template <std::size_t, typename U>
+    using index_pair = U;
+
     constexpr auto format_submdspan(auto &&x, auto &ctx, std::size_t depth) const{
         constexpr auto rank = std::remove_cvref_t<decltype(x)>::rank();
 
@@ -32,11 +35,11 @@ private:
 
             const auto primary_extent = x.extent(std::is_same_v<LayoutPolicy, std::layout_right> ? 0 : rank - 1);
             if (primary_extent > 0){
-                for (std::size_t i = 0; i < primary_extent - (std::size_t)1; ++i){
+                for (std::size_t i = 0; i < primary_extent - 1; ++i){
                     format_submdspan(reduce_dimension(x, i), ctx, depth + 1);
                     format_to(ctx.out(), ",\n{0: >{1}}", "", depth);
                 }
-                format_submdspan(reduce_dimension(x, primary_extent - (std::size_t)1), ctx, depth + 1);
+                format_submdspan(reduce_dimension(x, primary_extent - 1), ctx, depth + 1);
             }
 
             return format_to(ctx.out(), "]");
@@ -64,13 +67,15 @@ private:
      */
     template <typename... Indices>
     static constexpr auto reduce_dimension(auto &&x, Indices ...indices) {
+        constexpr auto rank = std::remove_cvref_t<decltype(x)>::rank();
+
         return [&]<std::size_t... I>(std::index_sequence<I...>){
             if constexpr (std::is_same_v<LayoutPolicy, std::layout_right>){
-                return std::experimental::submdspan(x, indices..., std::make_pair(I, std::full_extent).second...);
+                return std::experimental::submdspan(x, indices..., index_pair<I, std::full_extent_t>{}...);
             }
             else{
-                return std::experimental::submdspan(x, std::make_pair(I, std::full_extent).second..., indices...);
+                return std::experimental::submdspan(x, index_pair<I, std::full_extent_t>{}..., indices...);
             }
-        }(std::make_index_sequence<std::remove_cvref_t<decltype(x)>::rank() - sizeof...(Indices)>{});
+        }(std::make_index_sequence<rank - sizeof...(Indices)>{});
     }
 };
