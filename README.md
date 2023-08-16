@@ -84,7 +84,7 @@ int main(int, char**) {
 It supports C++23's range formatting specifier and left spacing for rank ≥ 2 span.
 For fixed size mdspan (whose extent is known at compile time), formatting is optimized using `constexpr` declared variables.
 
-It is tested with [Google test](https://github.com/google/googletest/issues), but not robust. I appreciate your contribution.
+It is tested with [μt](https://github.com/boost-ext/ut).
 
 Note that it only supports `mdspan` with `default_accessor` accessor.
 
@@ -103,5 +103,5 @@ implemented mdspan at now.
 For use formatter, copy [the header file](https://github.com/stripe2933/mdspan_formatter/blob/main/include/mdspan_formatter.hpp).
 You can use the library as header only file.
 
-If you want to build the test, download the repository and build CMake project. Note that Google Test, fmt and Kokkos mdspan library should be found using
+If you want to build the test, download the repository and build CMake project. Note that μt, fmt and Kokkos mdspan library should be found using
 `find_package` command.

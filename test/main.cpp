@@ -1,6 +1,8 @@
-#include <gtest/gtest.h>
+#include "tests.hpp"
 
 int main(int argc, char **argv) {
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    mdspan_formatter_test::std_formatter::layout_right_test();
+    mdspan_formatter_test::std_formatter::layout_left_test();
+    mdspan_formatter_test::fmt_formatter::layout_right_test();
+    mdspan_formatter_test::fmt_formatter::layout_left_test();
 }

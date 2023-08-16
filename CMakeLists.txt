@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 project(mdspan_formatter)
 
-set(BUILD_TEST ON) # ON -> Build test (requires GoogleTest and fmt)
+set(BUILD_TEST ON) # ON -> Build test (requires Boost::ut and fmt)
 
 add_library(mdspan_formatter INTERFACE)
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)

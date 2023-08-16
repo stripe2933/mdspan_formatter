@@ -1,14 +1,14 @@
 #pragma once
 
-#include <format>
+#include <fmt/ranges.h>
 
 #include <experimental/mdspan>
 #include <experimental/__p2630_bits/submdspan.hpp>
 
 template <typename T, typename Extents, typename LayoutPolicy, typename CharT>
-class std::formatter<std::mdspan<T, Extents, LayoutPolicy>, CharT> : public range_formatter<T, CharT>{
+class fmt::formatter<std::mdspan<T, Extents, LayoutPolicy>, CharT> : public range_formatter<T, CharT>{
 public:
-    constexpr auto format(const auto &x, auto &ctx) const{
+    constexpr auto format(const auto &x, format_context &ctx) const{
         return format_submdspan(reduce_dimension(x), ctx, 1);
     }
 
@@ -16,25 +16,25 @@ private:
     template <std::size_t, typename U>
     using index_pair = U;
 
-    constexpr auto format_submdspan(auto &&x, auto &ctx, std::size_t depth) const{
+    constexpr auto format_submdspan(auto &&x, format_context &ctx, std::size_t depth) const{
         constexpr auto rank = std::remove_cvref_t<decltype(x)>::rank();
 
         if constexpr (rank == 1){
             return range_formatter<T, CharT>::format(std::span { x.data_handle(), static_cast<std::size_t>(x.extent(0)) }, ctx);
         }
         else{
-            format_to(ctx.out(), "[");
+            fmt::format_to(ctx.out(), "[");
 
             const auto primary_extent = x.extent(std::is_same_v<LayoutPolicy, std::layout_right> ? 0 : rank - 1);
             if (primary_extent > 0){
                 for (std::size_t i = 0; i < primary_extent - 1; ++i){
                     format_submdspan(reduce_dimension(x, i), ctx, depth + 1);
-                    format_to(ctx.out(), ",\n{0: >{1}}", "", depth);
+                    fmt::format_to(ctx.out(), ",\n{0: >{1}}", "", depth);
                 }
                 format_submdspan(reduce_dimension(x, primary_extent - 1), ctx, depth + 1);
             }
 
-            return format_to(ctx.out(), "]");
+            return fmt::format_to(ctx.out(), "]");
         }
     }
 
