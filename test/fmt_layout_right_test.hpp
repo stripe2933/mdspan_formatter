@@ -8,7 +8,7 @@ namespace mdspan_formatter_test::fmt_formatter{
         using namespace boost::ut;
         using namespace std::string_view_literals;
 
-        void fixed_size_ints_test(){
+        inline void fixed_size_ints_test(){
             std::array nums { 1, 2, 3, 4, 5, 6 };
 
             std::mdspan<int, std::extents<std::size_t, 6>> nums1d { nums.data() };
@@ -27,7 +27,7 @@ namespace mdspan_formatter_test::fmt_formatter{
                    " [6]]"sv == fmt::format("{}", nums6x1));
         }
 
-        void fixed_size_floats_test(){
+        inline void fixed_size_floats_test(){
             std::array nums {
                     1.f, 2.f, 3.f, 4.f,
                     5.f, 6.f, 7.f, 8.f,
@@ -61,7 +61,7 @@ namespace mdspan_formatter_test::fmt_formatter{
                    "  [ 13,  14,  15,  16]]]"sv == fmt::format("{:: >3}", nums2x2x4));
         }
 
-        void fixed_size_chars_test(){
+        inline void fixed_size_chars_test(){
             std::array magic_square {
                     'S', 'A', 'T', 'O', 'R',
                     'A', 'R', 'E', 'P', 'O',
@@ -78,7 +78,7 @@ namespace mdspan_formatter_test::fmt_formatter{
                    " ['R', 'O', 'T', 'A', 'S']]"sv == fmt::format("{::?}", square5x5));
         }
 
-        void dynamic_size_ints_test(){
+        inline void dynamic_size_ints_test(){
             std::array nums { 1, 2, 3, 4, 5, 6 };
 
             std::mdspan nums1d { nums.data(), 6 };
@@ -97,7 +97,7 @@ namespace mdspan_formatter_test::fmt_formatter{
                    " [6]]"sv == fmt::format("{}", nums6x1));
         }
 
-        void dynamic_size_floats_test(){
+        inline void dynamic_size_floats_test(){
             std::array nums {
                     1.f, 2.f, 3.f, 4.f,
                     5.f, 6.f, 7.f, 8.f,
@@ -131,7 +131,7 @@ namespace mdspan_formatter_test::fmt_formatter{
                    "  [ 13,  14,  15,  16]]]"sv == fmt::format("{:: >3}", nums2x2x4));
         }
 
-        void dynamic_size_chars_test(){
+        inline void dynamic_size_chars_test(){
             std::array magic_square {
                     'S', 'A', 'T', 'O', 'R',
                     'A', 'R', 'E', 'P', 'O',
@@ -148,7 +148,7 @@ namespace mdspan_formatter_test::fmt_formatter{
                    " ['R', 'O', 'T', 'A', 'S']]"sv == fmt::format("{::?}", square5x5));
         }
 
-        void static_zero_size_test(){
+        inline void static_zero_size_test(){
             std::array one { 1 };
             expect("[]"sv == fmt::format("{}", std::mdspan<int, std::extents<std::size_t, 0>> { one.data() }));
             expect("[[],\n"
@@ -156,16 +156,16 @@ namespace mdspan_formatter_test::fmt_formatter{
             expect("[]"sv == fmt::format("{}", std::mdspan<int, std::extents<int, 0, 3>> { one.data() }));
         }
 
-        void dynamic_zero_size_test(){
+        inline void dynamic_zero_size_test(){
             std::array one { 1 };
             expect("[]"sv == fmt::format("{}", std::mdspan { one.data(), 0 }));
             expect("[[],\n"
                    " []]"sv == fmt::format("{}", std::mdspan { one.data(), 2, 0 }));
             expect("[]"sv == fmt::format("{}", std::mdspan { one.data(), 0, 3 }));
         }
-    };
+    }
 
-    void layout_right_test(){
+    inline void layout_right_test(){
         layout_right::fixed_size_ints_test();
         layout_right::fixed_size_floats_test();
         layout_right::fixed_size_chars_test();
@@ -175,4 +175,4 @@ namespace mdspan_formatter_test::fmt_formatter{
         layout_right::static_zero_size_test();
         layout_right::dynamic_zero_size_test();
     }
-};
+}
