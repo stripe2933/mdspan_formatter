@@ -21,4 +21,8 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(ut)
 
 add_executable(mdspan_formatter_test main.cpp)
-target_link_libraries(mdspan_formatter_test PRIVATE mdspan_formatter fmt::fmt Boost::ut)
+target_link_libraries(mdspan_formatter_test
+    PRIVATE
+        mdspan_formatter
+        fmt::fmt Boost::ut
+)
