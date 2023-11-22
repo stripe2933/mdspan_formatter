@@ -9,15 +9,16 @@ target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
 target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_23)
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    # To use std::format in Clang, -fexperimental-library compile option and
-    # libc++experimental.a library must be explicitly linked.
-    target_compile_options(${PROJECT_NAME} INTERFACE -fexperimental-library)
-    target_link_directories(${PROJECT_NAME} INTERFACE /opt/homebrew/opt/llvm/lib/c++) # Your libc++ lib directory
-    target_link_libraries(${PROJECT_NAME} INTERFACE c++experimental)
-endif()
+include(FetchContent)
 
-find_package(mdspan REQUIRED)
+# Fetch mdspan
+FetchContent_Declare(
+    mdspan
+    GIT_REPOSITORY https://github.com/kokkos/mdspan.git
+    GIT_TAG stable
+)
+FetchContent_MakeAvailable(mdspan)
+
 target_link_libraries(${PROJECT_NAME} INTERFACE std::mdspan)
 
 # Determine if the project is built as a main project or a subproject (using add_subdirectory).

@@ -63,10 +63,10 @@ private:
 
         return [&]<std::size_t... I>(std::index_sequence<I...>){
             if constexpr (std::is_same_v<LayoutPolicy, std::layout_right>){
-                return std::experimental::submdspan(x, indices..., index_pair<I, std::full_extent_t>{}...);
+                return std::submdspan(x, indices..., index_pair<I, std::full_extent_t>{}...);
             }
             else{
-                return std::experimental::submdspan(x, index_pair<I, std::full_extent_t>{}..., indices...);
+                return std::submdspan(x, index_pair<I, std::full_extent_t>{}..., indices...);
             }
         }(std::make_index_sequence<rank - sizeof...(Indices)>{});
     }
