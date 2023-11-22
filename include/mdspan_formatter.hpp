@@ -8,7 +8,7 @@
 template <typename T, typename Extents, typename LayoutPolicy, typename CharT>
 class std::formatter<std::mdspan<T, Extents, LayoutPolicy>, CharT> : public range_formatter<T, CharT>{
 public:
-    constexpr auto format(const auto &x, auto &ctx) const{
+    constexpr auto format(const std::mdspan<T, Extents, LayoutPolicy> &x, auto &ctx) const{
         return format_submdspan(reduce_dimension(x), ctx, 1);
     }
 

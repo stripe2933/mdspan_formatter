@@ -8,7 +8,7 @@
 template <typename T, typename Extents, typename LayoutPolicy, typename CharT>
 class fmt::formatter<std::mdspan<T, Extents, LayoutPolicy>, CharT> : public range_formatter<T, CharT>{
 public:
-    constexpr auto format(const auto &x, format_context &ctx) const{
+    constexpr auto format(const auto &x, format_context &ctx) const -> format_context::iterator{
         return format_submdspan(reduce_dimension(x), ctx, 1);
     }
 
@@ -16,7 +16,7 @@ private:
     template <std::size_t, typename U>
     using index_pair = U;
 
-    constexpr auto format_submdspan(auto &&x, format_context &ctx, std::size_t depth) const{
+    constexpr auto format_submdspan(auto &&x, format_context &ctx, std::size_t depth) const -> format_context::iterator{
         constexpr auto rank = std::remove_cvref_t<decltype(x)>::rank();
 
         if constexpr (rank == 1){
