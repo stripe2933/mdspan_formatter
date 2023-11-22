@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.24)
 project(mdspan_formatter
     DESCRIPTION "Make std::mdspan formattable by std::format (or fmt::format)."
     HOMEPAGE_URL "https://github.com/stripe2933/mdspan_formatter"
@@ -16,6 +16,7 @@ FetchContent_Declare(
     mdspan
     GIT_REPOSITORY https://github.com/kokkos/mdspan.git
     GIT_TAG stable
+    FIND_PACKAGE_ARGS NAMES mdspan
 )
 FetchContent_MakeAvailable(mdspan)
 
