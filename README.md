@@ -1,4 +1,7 @@
 # mdspan_formatter
+
+![Build with Clang](https://github.com/stripe2933/mdspan_formatter/actions/workflows/clang.yml/badge.svg)
+
 Make `std::mdspan` (multi-dimensional span; currently [`Kokkos::mdspan`](https://github.com/kokkos/mdspan)) formattable using `std::format` or [`fmt::format`](https://github.com/fmtlib/fmt).
 
 ## Usage
@@ -86,9 +89,9 @@ Note that it only supports `mdspan` with `default_accessor` accessor.
 ```cmake
 include(FetchContent)
 FetchContent_Declare(
-        mdspan_formatter
-        GIT_REPOSITORY https://github.com/stripe2933/mdspan_formatter.git
-        GIT_TAG main
+    mdspan_formatter
+    GIT_REPOSITORY https://github.com/stripe2933/mdspan_formatter.git
+    GIT_TAG main
 )
 FetchContent_MakeAvailable(mdspan_formatter)
 
@@ -102,9 +105,8 @@ GCC and MSVC are not tested yet.
 
 For use library with fmt, Clang ≥ 11.0.0 and GCC ≥ 10.2 with std ≥ c++20 condition are tested. MSVC is not tested yet.
  [Try on Compiler Explorer](https://godbolt.org/z/1sTd18Gxs).
-
+****
 First, you need [Kokkos's mdspan](https://github.com/kokkos/mdspan), which is reference implementation of `std::mdspan` because none of compiler
-implemented mdspan at now.
+implemented submdspan at now.
 
-If you want to build the test, download the repository and build CMake project. Note that μt, fmt and Kokkos mdspan library should be found using
-`find_package` command.
+If you want to build the test, download the repository and build CMake project.
