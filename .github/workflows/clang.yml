@@ -26,6 +26,7 @@ jobs:
           cmake -S . -B build -G Ninja \
           -DCMAKE_CXX_COMPILER=${{ env.LLVM_PATH }}/bin/clang++ \
           -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi"
           ninja -C build
 
       - name: Run tests
