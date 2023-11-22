@@ -21,14 +21,11 @@ FetchContent_MakeAvailable(mdspan)
 
 target_link_libraries(${PROJECT_NAME} INTERFACE std::mdspan)
 
-# Determine if the project is built as a main project or a subproject (using add_subdirectory).
-# If main project, build test.
-if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-    set(BUILD_TEST ON)
-else()
-    set(BUILD_TEST OFF)
+# Set MDSPAN_FORMATTER_BUILD_TEST flag if it is unset and project is top-level project.
+if (NOT DEFINED MDSPAN_FORMATTER_BUILD_TEST)
+    set(MDSPAN_FORMATTER_BUILD_TEST (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR))
 endif()
 
-if (BUILD_TEST)
+if (MDSPAN_FORMATTER_BUILD_TEST)
     add_subdirectory(test)
 endif()
