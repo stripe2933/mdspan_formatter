@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.24)
 project(mdspan_formatter
     DESCRIPTION "Make std::mdspan formattable by std::format (or fmt::format)."
     HOMEPAGE_URL "https://github.com/stripe2933/mdspan_formatter"
-    LANGUAGES CXX)
+    LANGUAGES CXX
+    VERSION 0.1.0
+)
 
 add_library(mdspan_formatter INTERFACE)
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
