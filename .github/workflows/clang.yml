@@ -7,30 +7,29 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
+
     steps:
-      - name: Checkout code
+      - name: checkout
         uses: actions/checkout@v4
 
-      - name: Install LLVM and Clang
-        uses: KyleMayes/install-llvm-action@v1
-        with:
-          version: 17
+      - name: Get LLVM 17 via Homebrew
+        run: |
+          brew install llvm@17
 
-      - name: Install CMake and Ninja
-        uses: lukka/get-cmake@latest
-
-      - name: Build project
+      - name: configure
         run: |
           mkdir build
-          cmake -S . -B build -G Ninja \
-          -DCMAKE_CXX_COMPILER=${{ env.LLVM_PATH }}/bin/clang++ \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} -stdlib=libc++ -v" \
-          -DCMAKE_EXE_LINKER_FLAGS="${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi"
-          ninja -C build
+          cmake -S . -B build \
+            -DCMAKE_C_COMPILER=$(brew --prefix llvm@17)/bin/clang \
+            -DCMAKE_CXX_COMPILER=$(brew --prefix llvm@17)/bin/clang++ \
+            -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} -stdlib=libc++ -v" \
+            -DCMAKE_EXE_LINKER_FLAGS="${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ -lc++abi"
 
-      - name: Run tests
+      - name: build
         run: |
-          cd build/test
-          ./mdspan_formatter_test
+          cmake --build build --config Release -j4
+
+      - name: test
+        run: |
+          ctest --test-dir build/test --build-config Release

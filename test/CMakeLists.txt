@@ -19,6 +19,7 @@ FetchContent_Declare(
     FIND_PACKAGE_ARGS NAMES ut
 )
 FetchContent_MakeAvailable(ut)
+target_compile_definitions(ut INTERFACE BOOST_UT_DISABLE_MODULE)
 
 add_executable(mdspan_formatter_test main.cpp)
 target_link_libraries(mdspan_formatter_test
@@ -26,3 +27,8 @@ target_link_libraries(mdspan_formatter_test
         mdspan_formatter
         fmt::fmt Boost::ut
 )
+
+include(CTest)
+enable_testing()
+
+add_test(add_test mdspan_formatter_test)
